@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.Scanner;
 
 public class Main {
@@ -8,6 +9,7 @@ public class Main {
     private static int reservationCount = 0;
 
     public static void main(String[] args) {
+        startUpDeserialize();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Welcome to 'Coworking Space Reservation' System");
@@ -24,7 +26,7 @@ public class Main {
                     userMenu(scanner);
                     break;
                 case 3:
-                    System.exit(0);
+                    exitSerialize();
                 default:
                     System.out.println("Invalid choice. Please enter again.");
             }
@@ -185,5 +187,33 @@ public class Main {
             }
         }
         System.out.println("Reservation not found.");
+    }
+
+    public static void exitSerialize(){
+        try(FileOutputStream fileOut = new FileOutputStream("appState");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+                out.writeObject(workspaces);
+                out.writeObject(reservations);
+                out.writeInt(reservationCount);
+                out.writeInt(reservationCount);
+            System.out.println("Data serialized.");
+        } catch (IOException exception) {
+            System.out.println("Error with serializing data.");
+        } finally {
+            System.exit(0);
+        }
+    }
+
+    private static void startUpDeserialize() {
+        try (FileInputStream fileIn = new FileInputStream("appState");
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            workspaces = (Workspace[]) in.readObject();
+            reservations = (Reservation[]) in.readObject();
+            workspaceCount = in.readInt();
+            reservationCount = in.readInt();
+            System.out.println("Data deserialized.");
+        } catch (IOException | ClassNotFoundException i) {
+            System.out.println("No previous state found");
+        }
     }
 }

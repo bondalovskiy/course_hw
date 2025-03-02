@@ -1,4 +1,6 @@
-class Reservation {
+import java.io.Serializable;
+
+class Reservation implements Serializable {
     int reservationId;
     String customerName;
     String date;
