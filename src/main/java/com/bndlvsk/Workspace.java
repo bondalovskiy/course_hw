@@ -1,8 +1,21 @@
+package com.bndlvsk;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
+@Getter
+@Setter
 class Workspace implements Serializable {
+    @Setter
+    @Getter
     private int id;
+    @Setter
+    @Getter
     private String name;
+    @Setter
+    @Getter
     private double price;
     private boolean isAvailable;
 
@@ -18,14 +31,6 @@ class Workspace implements Serializable {
         return "ID: " + id + ", Name: " + name + ", Price: $" + price + ", Available: " + isAvailable;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public boolean isAvailable() {
         return isAvailable;
     }
@@ -34,19 +39,4 @@ class Workspace implements Serializable {
         isAvailable = available;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }

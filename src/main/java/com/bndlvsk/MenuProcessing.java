@@ -1,3 +1,5 @@
+package com.bndlvsk;
+
 import java.util.Scanner;
 
 public class MenuProcessing {

@@ -1,13 +1,14 @@
+package com.bndlvsk;
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DataProcessing {
 
-    private static Workspace[] workspaces = new Workspace[10];
-    private static Reservation[] reservations = new Reservation[50];
-    private static int workspaceCount = 0;
-    private static int reservationCount = 0;
-
+    private static List<Workspace> workspaces = new ArrayList<>();
+    private static List<Reservation> reservations = new ArrayList<>();
 
     static void addWorkspace(Scanner scanner) {
         System.out.println("Enter workspace ID:");
@@ -20,33 +21,23 @@ public class DataProcessing {
         System.out.println("Is the workspace available? (true/false):");
         boolean isAvailable = scanner.nextBoolean();
 
-        workspaces[workspaceCount++] = new Workspace(id, name, price, isAvailable);
+        workspaces.add(new Workspace(id, name, price, isAvailable));
         System.out.println("Workspace added successfully.");
     }
 
     static void removeWorkspace(Scanner scanner) {
         System.out.println("Enter workspace ID to remove:");
         int id = scanner.nextInt();
-        for (int i = 0; i < workspaceCount; i++) {
-            if (workspaces[i].getId() == id) {
-                workspaces[i] = workspaces[--workspaceCount];
-                System.out.println("Workspace removed successfully.");
-                return;
-            }
-        }
-        System.out.println("Workspace not found.");
+        workspaces.removeIf(workspace -> workspace.getId() == id);
+        System.out.println("Workspace removed successfully.");
     }
 
     static void viewAllReservations() {
-        for (int i = 0; i < reservationCount; i++) {
-            System.out.println(reservations[i]);
-        }
+        reservations.forEach(System.out::println);
     }
 
     static void browseSpaces() {
-        for (int i = 0; i < workspaceCount; i++) {
-            System.out.println(workspaces[i]);
-        }
+        workspaces.forEach(System.out::println);
     }
 
     static void makeReservation(Scanner scanner) {
@@ -61,16 +52,13 @@ public class DataProcessing {
         System.out.println("Enter workspace ID:");
         int workspaceId = scanner.nextInt();
 
-        Workspace selectedWorkspace = null;
-        for (int i = 0; i < workspaceCount; i++) {
-            if (workspaces[i].getId() == workspaceId && workspaces[i].isAvailable()) {
-                selectedWorkspace = workspaces[i];
-                break;
-            }
-        }
+        Workspace selectedWorkspace = workspaces.stream()
+                .filter(w -> w.getId() == workspaceId && w.isAvailable())
+                .findFirst()
+                .orElse(null);
 
         if (selectedWorkspace != null) {
-            reservations[reservationCount++] = new Reservation(reservationCount + 1, name, date, startTime, endTime, selectedWorkspace);
+            reservations.add(new Reservation(reservations.size() + 1, name, date, startTime, endTime, selectedWorkspace));
             selectedWorkspace.setAvailable(false);
             System.out.println("Reservation made successfully.");
         } else {
@@ -81,34 +69,29 @@ public class DataProcessing {
     static void viewMyReservations(Scanner scanner) {
         System.out.println("Enter your name:");
         String name = scanner.next();
-        for (int i = 0; i < reservationCount; i++) {
-            if (reservations[i].getCustomerName().equals(name)) {
-                System.out.println(reservations[i]);
-            }
-        }
+        reservations.stream()
+                .filter(r -> r.getCustomerName().equals(name))
+                .forEach(System.out::println);
     }
 
     static void cancelReservation(Scanner scanner) {
         System.out.println("Enter reservation ID to cancel:");
         int id = scanner.nextInt();
-        for (int i = 0; i < reservationCount; i++) {
-            if (reservations[i].getReservationId() == id) {
-                reservations[i].getWorkspace().setAvailable(true);
-                reservations[i] = reservations[--reservationCount];
-                System.out.println("Reservation canceled successfully.");
-                return;
-            }
-        }
-        System.out.println("Reservation not found.");
+        reservations.stream()
+                .filter(r -> r.getReservationId() == id)
+                .findFirst()
+                .ifPresent(r -> {
+                    r.getWorkspace().setAvailable(true);
+                    reservations.remove(r);
+                    System.out.println("Reservation canceled successfully.");
+                });
     }
 
-    public static void exitSerialize(){
+    public static void exitSerialize() {
         try(FileOutputStream fileOut = new FileOutputStream("appState");
             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(workspaces);
-            out.writeObject(reservations);
-            out.writeInt(workspaceCount);
-            out.writeInt(reservationCount);
+            out.writeObject(new ArrayList<>(workspaces));
+            out.writeObject(new ArrayList<>(reservations));
             System.out.println("Data serialized.");
         } catch (IOException exception) {
             System.out.println("Error with serializing data.");
@@ -120,14 +103,11 @@ public class DataProcessing {
     static void startUpDeserialize() {
         try (FileInputStream fileIn = new FileInputStream("appState");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            workspaces = (Workspace[]) in.readObject();
-            reservations = (Reservation[]) in.readObject();
-            workspaceCount = in.readInt();
-            reservationCount = in.readInt();
+            workspaces = (List<Workspace>) in.readObject();
+            reservations = (List<Reservation>) in.readObject();
             System.out.println("Data deserialized.");
         } catch (IOException | ClassNotFoundException i) {
             System.out.println("No previous state found");
         }
     }
-
 }
