@@ -1,7 +1,13 @@
 package com.bndlvsk;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
+@Setter
+@Getter
 class Reservation implements Serializable {
     private int reservationId;
     private String customerName;
@@ -24,51 +30,4 @@ class Reservation implements Serializable {
         return "Reservation ID: " + reservationId + ", Customer: " + customerName + ", Date: " + date + ", Time: " + startTime + " - " + endTime + ", Workspace: " + workspace.getName();
     }
 
-    public int getReservationId() {
-        return reservationId;
-    }
-
-    public void setReservationId(int reservationId) {
-        this.reservationId = reservationId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
 }
